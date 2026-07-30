@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { PopupButton } from "react-calendly";
+import ArrowExternal from "./ArrowExternal";
 
 const NAVY = "#1E1646";
 
@@ -119,6 +120,7 @@ function Section({ title, children }) {
 export default function Sections() {
   const imgRef = useRef(null);
   const imgWrapRef = useRef(null);
+  const badgeListRef = useRef(null);
 
   useLayoutEffect(() => {
     if (!imgRef.current || !imgWrapRef.current) return;
@@ -134,6 +136,43 @@ export default function Sections() {
           toggleActions: "play none none none",
         },
       });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  // Stagger animation for the badge list in the first section
+  useLayoutEffect(() => {
+    if (!badgeListRef.current) return;
+    const ctx = gsap.context(() => {
+      const labelEl = badgeListRef.current.parentElement.querySelector(
+        ".specialite-label",
+      );
+      const badges = badgeListRef.current.querySelectorAll("li");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: badgeListRef.current,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      tl.fromTo(
+        labelEl,
+        { autoAlpha: 0, y: 30 },
+        { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" },
+      ).fromTo(
+        badges,
+        { autoAlpha: 0, y: 40 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          stagger: 0.14,
+        },
+        "-=0.4",
+      );
     });
     return () => ctx.revert();
   }, []);
@@ -195,18 +234,19 @@ export default function Sections() {
               et leurs aspirations… pour (re)devenir les capitaines de leur vie.
             </p>
 
-            <div className="reveal-item" style={{ marginTop: "32px" }}>
+            <div style={{ marginTop: "32px" }}>
               <p
+                className="specialite-label"
                 style={{
                   ...label,
                   marginBottom: "14px",
-                  opacity: 1,
                   fontSize: "17px",
                 }}
               >
                 Spécialisée dans
               </p>
               <ul
+                ref={badgeListRef}
                 style={{
                   listStyle: "none",
                   padding: 0,
@@ -223,16 +263,16 @@ export default function Sections() {
                 ].map((item) => (
                   <li
                     key={item}
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 300,
-                      fontSize: "13px",
-                      color: NAVY,
-                      padding: "10px 22px",
-                      border: `1px solid ${NAVY}`,
-                      borderRadius: "999px",
-                      display: "inline-block",
-                    }}
+                     style={{
+                       fontFamily: "'DM Sans', sans-serif",
+                       fontWeight: 300,
+                       fontSize: "13px",
+                       color: NAVY,
+                       padding: "10px 22px",
+                       border: `1px solid ${NAVY}`,
+                       borderRadius: "999px",
+                       display: "inline-block",
+                     }}
                   >
                     {item}
                   </li>
@@ -292,21 +332,33 @@ export default function Sections() {
       <Section title="Contact">
         <p className="reveal-item" style={{ ...body, marginBottom: "14px" }}>
           <a
+            className="contact-link"
             href="mailto:info@capitaines-sophrologie.fr"
-            style={{ color: NAVY }}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            info@capitaines-sophrologie.fr
+            <span className="contact-text">info@capitaines-sophrologie.fr</span>
+            <ArrowExternal className="arrow" />
           </a>
           <br />
-          06 32 38 62 58
+          <a
+            className="contact-link"
+            href="https://wa.me/330632386258"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="contact-text">06 32 38 62 58</span>
+            <ArrowExternal className="arrow" />
+          </a>
           <br />
           <a
+            className="contact-link"
             href="https://instagram.com/capitaines.sophrologie"
             target="_blank"
             rel="noreferrer"
-            style={{ color: NAVY }}
           >
-            @capitaines.sophrologie
+            <span className="contact-text">@capitaines.sophrologie</span>
+            <ArrowExternal className="arrow" />
           </a>
         </p>
         <div className="reveal-item" style={{ display: "inline-block" }}>
