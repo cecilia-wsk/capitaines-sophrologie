@@ -33,6 +33,7 @@ uniform vec2 uMouseVel;
 uniform float uMouseInfluence;
 uniform float uMouseWarp;
 uniform float uScroll;
+uniform vec3 uTargetColor;
 out vec4 fragColor;
 #define S(a,b,t) smoothstep(a,b,t)
 mat2 Rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);} 
@@ -80,6 +81,31 @@ vec3 gradientField(vec2 p,float t){
   blob(acc,total,p,vec2( 0.88,0.68)+orb(t,0.13,2.2,vec2(0.040,0.030)),vec2(0.16,0.12),vec3(0.925,0.604,0.643),0.90); // salmon mid
   return acc/total;
 }
+
+// --- Section texture field: light/shadow contrast that reads on any pastel ----
+// Colours range from bright highlights to warm mid-tones so shape is always
+// visible, regardless of which section background (cream/orange/rose) is active.
+vec3 sectionField(vec2 p,float t){
+  vec3 acc=vec3(0.0);
+  float total=0.0;
+  // bright cream highlight
+  blob(acc,total,p,vec2(0.30,0.40)+orb(t,0.06,0.0,vec2(0.18,0.12)),vec2(0.60,0.45),vec3(1.00,0.96,0.88),2.5);
+  // deeper warm shadow
+  blob(acc,total,p,vec2(0.70,0.35)+orb(t,0.05,2.5,vec2(0.16,0.11)),vec2(0.55,0.40),vec3(0.92,0.75,0.58),2.2);
+  // pale lavender highlight
+  blob(acc,total,p,vec2(0.45,0.65)+orb(t,0.07,4.0,vec2(0.14,0.10)),vec2(0.50,0.38),vec3(0.96,0.88,0.96),2.0);
+  // peach shadow
+  blob(acc,total,p,vec2(0.55,0.20)+orb(t,0.05,1.2,vec2(0.15,0.10)),vec2(0.48,0.36),vec3(0.98,0.78,0.62),1.8);
+  // cream highlight
+  blob(acc,total,p,vec2(0.25,0.75)+orb(t,0.06,3.8,vec2(0.13,0.09)),vec2(0.52,0.40),vec3(1.00,0.95,0.85),1.9);
+  // top-left drift: warm peach
+  blob(acc,total,p,vec2(0.15,0.18)+orb(t,0.05,5.5,vec2(0.12,0.08)),vec2(0.45,0.35),vec3(1.00,0.85,0.68),2.0);
+  // top-left drift: pale lavender
+  blob(acc,total,p,vec2(0.22,0.28)+orb(t,0.04,0.8,vec2(0.10,0.07)),vec2(0.48,0.38),vec3(0.94,0.86,0.95),1.7);
+  // soft rose blob — drawn directly in mainImage as additive glow
+  // (removed from sectionField to avoid dilution among other blobs)
+  return acc/max(total,0.001);
+}
 // ---------------------------------------------------------------------------
 
 void mainImage(out vec4 o, vec2 C){
@@ -117,9 +143,26 @@ void mainImage(out vec4 o, vec2 C){
   // Scroll drift: the whole field travels as the page scrolls
   p+=vec2(uScroll*0.15,uScroll*0.45);
   vec3 col=gradientField(p,t*3.0);
-  // ...then settles into the lightest tone of the palette (cream)
-  const vec3 LIGHTEST=vec3(0.973,0.910,0.792);
-  col=mix(col,LIGHTEST,smoothstep(0.2,0.9,uScroll));
+  // Settle: hero artwork -> section background tone + visible blob texture
+  float settle=smoothstep(0.2,0.80,uScroll);
+  vec3 sectionRaw=sectionField(uv,t*1.6);
+  // Tint the textured field toward the section's base colour so each
+  // section (cream / orange / rose) has its own overall hue while
+  // keeping the light/shadow shapes readable.
+  vec3 sectionCol=mix(sectionRaw,uTargetColor,0.42);
+  col=mix(col,sectionCol,settle);
+
+  // --- Standalone cursor-follow soft-rose glow (only in sections) ---
+  if(settle>0.01){
+    vec2 mouseUV=uMouse*0.5+0.5;
+    // aspect-correct Gaussian falloff around the cursor
+    vec2 cd=(uv-mouseUV)/vec2(0.1,0.1*ratio);
+    float glow=exp(-dot(cd,cd));
+    // shift section colour toward a pale rose-lilac (no additive clipping)
+    vec3 roseLilac=vec3(1.00,0.72,0.88);
+    col=mix(col,roseLilac,0.45*glow*settle);
+  }
+  // ------------------------------------------------------------------
 
   vec2 grainUv=uv*max(uGrainScale,0.001);
   if(uGrainAnimated>0.5){grainUv+=vec2(iTime*0.05);} 
@@ -167,7 +210,8 @@ const Grainient = ({
   mouseInfluence = 0.0,
   mouseWarp = 0.0,
   scrollProgress = 0.0,
-  className = ''
+  targetColor = [0.973, 0.91, 0.792],
+  className = "",
 }) => {
   const containerRef = useRef(null);
 
@@ -217,6 +261,7 @@ const Grainient = ({
         uMouseInfluence: { value: 0.0 },
         uMouseWarp: { value: 0.0 },
         uScroll: { value: 0.0 },
+        uTargetColor: { value: new Float32Array([0.973, 0.91, 0.792]) },
       },
     });
 
@@ -352,6 +397,7 @@ const Grainient = ({
     u.uMouseInfluence.value = mouseInfluence;
     u.uMouseWarp.value = mouseWarp;
     u.uScroll.value = scrollProgress;
+    u.uTargetColor.value = new Float32Array(targetColor);
   }, [
     timeSpeed,
     warpStrength,
@@ -372,6 +418,7 @@ const Grainient = ({
     mouseInfluence,
     mouseWarp,
     scrollProgress,
+    targetColor,
   ]);
 
   return (

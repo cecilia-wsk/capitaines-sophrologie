@@ -1,9 +1,10 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useEffect } from "react";
 import gsap from "gsap";
 
 export default function ScrollHint({ style, className, onClick }) {
   const root = useRef(null);
 
+  // Entrance animation (fade in + float yoyo)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       gsap.set(root.current, { xPercent: -50 });
@@ -24,6 +25,30 @@ export default function ScrollHint({ style, className, onClick }) {
       });
     }, root);
     return () => ctx.revert();
+  }, []);
+
+  // Fade out as soon as the user starts scrolling
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+
+    let raf = 0;
+
+    const tick = () => {
+      raf = 0;
+      const t = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.25)));
+      gsap.set(el, { opacity: 1 - t });
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (

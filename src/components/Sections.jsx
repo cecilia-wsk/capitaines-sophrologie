@@ -1,3 +1,5 @@
+import { useRef, useLayoutEffect } from "react";
+import gsap from "gsap";
 import { PopupButton } from "react-calendly";
 
 const NAVY = "#1E1646";
@@ -28,66 +30,220 @@ const body = {
   maxWidth: "600px",
 };
 
-function Section({ index, title, children }) {
+/* ---- Dash-style title mask + line-by-line item reveal ------------------- */
+function SectionTitle({ text }) {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const chars = ref.current.querySelectorAll(".char");
+      gsap.from(chars, {
+        yPercent: 120,
+        duration: 1.2,
+        ease: "power4.out",
+        stagger: 0.035,
+        scrollTrigger: {
+          trigger: ref.current,
+          start: "top 82%",
+          toggleActions: "play none none none",
+        },
+      });
+    }, ref);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <h2
+      ref={ref}
+      className="section-title"
+      style={{
+        ...heading,
+        overflow: "hidden",
+        display: "block",
+      }}
+    >
+      {text.split("").map((ch, i) => (
+        <span
+          key={i}
+          className="char"
+          style={{
+            display: "inline-block",
+            willChange: "transform",
+          }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      ))}
+    </h2>
+  );
+}
+
+function Section({ title, children }) {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const items = ref.current.querySelectorAll(".reveal-item");
+
+      items.forEach((item, i) => {
+        gsap.from(item, {
+          y: 50,
+          opacity: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          delay: i * 0.08,
+          scrollTrigger: {
+            trigger: item,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+    }, ref);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={ref}
       style={{ maxWidth: "980px", margin: "0 auto", padding: "15vh 24px" }}
     >
-      <span style={label}>{index}</span>
-      <h2 style={heading}>{title}</h2>
+      {title && <SectionTitle text={title} />}
       {children}
     </section>
   );
 }
+/* -------------------------------------------------------------------------- */
 
 export default function Sections() {
+  const imgRef = useRef(null);
+  const imgWrapRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!imgRef.current || !imgWrapRef.current) return;
+    const ctx = gsap.context(() => {
+      // Curtain reveal: image slides up from below the mask
+      gsap.from(imgRef.current, {
+        yPercent: 100,
+        duration: 1.6,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: imgWrapRef.current,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
     <>
-      <Section index="01" title="À propos">
-        <p style={body}>
-          Je me présente, je suis Fred et avant de devenir sophrologue
-          certifiée, j'ai accompagné les femmes autrement. À travers le
-          maquillage et le relooking, le regard porté sur soi, l'image que l'on
-          apprivoise… Également à travers l'univers de la lingerie.
-        </p>
-        <p style={{ ...body, marginTop: "20px" }}>
-          Et puis surtout, je suis une femme qui a grandi entourée de femmes.
-          J'ai vu ma mère donner énormément aux autres, jongler entre mille
-          responsabilités, gérer une charge mentale constante au point de
-          s'oublier en chemin. Et très tôt, j'ai compris combien beaucoup de
-          femmes ont à cœur d'être présentes pour tout le monde… sauf pour
-          elles-mêmes.
-        </p>
-        <p style={{ ...body, marginTop: "20px" }}>
-          Ce qui m'anime, c'est d'accompagner les femmes à se réapproprier leur
-          corps, leur place, leurs besoins, leurs envies et leurs aspirations…
-          pour (re)devenir les capitaines de leur vie.
-        </p>
-        <div
-          style={{
-            width: "48px",
-            height: "1px",
-            background: NAVY,
-            opacity: 0.35,
-            margin: "52px 0 36px",
-          }}
-        />
-        <p
-          style={{
-            fontFamily: "'King and Queen', serif",
-            fontWeight: 400,
-            fontSize: "clamp(26px, 3.4vw, 40px)",
-            lineHeight: 1.35,
-            color: NAVY,
-            maxWidth: "720px",
-          }}
-        >
-          « Fais de toi la Capitaine de ta vie, une femme en puissance qui
-          s'écoute, qui s'honore, qui se remet au centre. »
-        </p>
+      <Section>
+        <div className="about-grid" style={{ maxWidth: "920px" }}>
+          <div
+            className="about-cell about-photo reveal-item"
+            ref={imgWrapRef}
+            style={{ overflow: "hidden" }}
+          >
+            <img
+              ref={imgRef}
+              src="/images/fred.jpg"
+              alt="Fred Roche — sophrologue"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </div>
+
+          <p
+            className="about-cell about-quote reveal-item"
+            style={{
+              fontFamily: "'King and Queen', serif",
+              fontWeight: 400,
+              fontSize: "clamp(26px, 3.4vw, 40px)",
+              lineHeight: 1.35,
+              color: NAVY,
+            }}
+          >
+            Fais de toi la Capitaine de ta vie, une femme en puissance qui
+            s&apos;écoute, qui s&apos;honore, qui se remet au centre.
+          </p>
+
+          <div className="about-cell about-paragraphs">
+            <p className="reveal-item" style={body}>
+              Je me présente, je suis Fred et avant de devenir sophrologue
+              certifiée, j&apos;ai accompagné les femmes autrement. À travers le
+              maquillage et le relooking, le regard porté sur soi, l&apos;image
+              que l&apos;on apprivoise...
+            </p>
+            <p className="reveal-item" style={{ ...body, marginTop: "20px" }}>
+              Et puis surtout, je suis une femme qui a grandi entourée de
+              femmes. J&apos;ai vu ma mère donner énormément aux autres, jongler
+              entre mille responsabilités, gérer une charge mentale constante au
+              point de s&apos;oublier en chemin. Et très tôt, j&apos;ai compris
+              combien beaucoup de femmes ont à cœur d&apos;être présentes pour
+              tout le monde...sauf pour elles-mêmes.
+            </p>
+            <p className="reveal-item" style={{ ...body, marginTop: "20px" }}>
+              Ce qui m&apos;anime, c&apos;est d&apos;accompagner les femmes à se
+              réapproprier leur corps, leur place, leurs besoins, leurs envies
+              et leurs aspirations… pour (re)devenir les capitaines de leur vie.
+            </p>
+
+            <div className="reveal-item" style={{ marginTop: "32px" }}>
+              <p
+                style={{
+                  ...label,
+                  marginBottom: "14px",
+                  opacity: 1,
+                  fontSize: "17px",
+                }}
+              >
+                Spécialisée dans
+              </p>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                }}
+              >
+                {[
+                  "La charge mentale",
+                  "La confiance & l'estime de soi",
+                  "La relation à soi, aux autres & à l'amour",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 300,
+                      fontSize: "13px",
+                      color: NAVY,
+                      padding: "10px 22px",
+                      border: `1px solid ${NAVY}`,
+                      borderRadius: "999px",
+                      display: "inline-block",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </Section>
 
-      <Section index="02" title="Les séances">
+      <Section title="Les séances">
         {[
           {
             name: "Séance découverte",
@@ -99,14 +255,10 @@ export default function Sections() {
             desc: "Un accompagnement personnalisé, au rythme de vos objectifs.",
             meta: "60 min — 65 €",
           },
-          {
-            name: "Atelier collectif",
-            desc: "En petit groupe, autour de thématiques mensuelles : charge mentale, estime de soi, relations.",
-            meta: "1h15 — 25 €",
-          },
         ].map((s, i) => (
           <div
             key={s.name}
+            className="reveal-item"
             style={{
               display: "flex",
               justifyContent: "space-between",
@@ -115,7 +267,7 @@ export default function Sections() {
               flexWrap: "wrap",
               padding: "30px 0",
               borderTop: `1px solid ${NAVY}22`,
-              borderBottom: i === 2 ? `1px solid ${NAVY}22` : "none",
+              borderBottom: i === 1 ? `1px solid ${NAVY}22` : "none",
             }}
           >
             <div style={{ maxWidth: "560px" }}>
@@ -137,8 +289,8 @@ export default function Sections() {
         ))}
       </Section>
 
-      <Section index="03" title="Contact">
-        <p style={{ ...body, marginBottom: "14px" }}>
+      <Section title="Contact">
+        <p className="reveal-item" style={{ ...body, marginBottom: "14px" }}>
           <a
             href="mailto:info@capitaines-sophrologie.fr"
             style={{ color: NAVY }}
@@ -157,12 +309,14 @@ export default function Sections() {
             @capitaines.sophrologie
           </a>
         </p>
-        <PopupButton
-          className="booking-button"
-          url="https://calendly.com/capitaines-sophrologie/nouvelle-reunion"
-          rootElement={document.getElementById("root")}
-          text="Prendre rendez-vous"
-        />
+        <div className="reveal-item" style={{ display: "inline-block" }}>
+          <PopupButton
+            className="booking-button"
+            url="https://calendly.com/capitaines-sophrologie/nouvelle-reunion"
+            rootElement={document.getElementById("root")}
+            text="Prendre rendez-vous"
+          />
+        </div>
       </Section>
 
       <footer
@@ -170,7 +324,7 @@ export default function Sections() {
           ...label,
           textAlign: "center",
           padding: "60px 24px",
-          opacity: 0.45,
+          opacity: 1,
         }}
       >
         © 2026 Capitaines Sophrologie — Mentions légales
