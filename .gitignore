@@ -5,6 +5,10 @@ dist-ssr
 
 .DS_Store
 
+# Python
+*.py
+__pycache__/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
