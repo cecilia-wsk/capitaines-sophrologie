@@ -144,9 +144,8 @@ export default function Sections() {
   useLayoutEffect(() => {
     if (!badgeListRef.current) return;
     const ctx = gsap.context(() => {
-      const labelEl = badgeListRef.current.parentElement.querySelector(
-        ".specialite-label",
-      );
+      const labelEl =
+        badgeListRef.current.parentElement.querySelector(".specialite-label");
       const badges = badgeListRef.current.querySelectorAll("li");
 
       const tl = gsap.timeline({
@@ -159,8 +158,8 @@ export default function Sections() {
 
       tl.fromTo(
         labelEl,
-        { autoAlpha: 0, y: 30 },
-        { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" },
+        { autoAlpha: 0, y: 40 },
+        { autoAlpha: 1, y: 0, duration: 0.9, ease: "power3.out" },
       ).fromTo(
         badges,
         { autoAlpha: 0, y: 40 },
@@ -181,6 +180,19 @@ export default function Sections() {
     <>
       <Section>
         <div className="about-grid" style={{ maxWidth: "920px" }}>
+          <p
+            className="about-cell about-quote reveal-item"
+            style={{
+              fontFamily: "'King and Queen', serif",
+              fontWeight: 400,
+              fontSize: "clamp(26px, 3.4vw, 40px)",
+              lineHeight: 1.35,
+              color: NAVY,
+            }}
+          >
+            Fais de toi la Capitaine de ta vie, une femme en puissance qui
+            s&apos;écoute, qui s&apos;honore, qui se remet au centre.
+          </p>
           <div
             className="about-cell about-photo reveal-item"
             ref={imgWrapRef}
@@ -198,20 +210,6 @@ export default function Sections() {
               }}
             />
           </div>
-
-          <p
-            className="about-cell about-quote reveal-item"
-            style={{
-              fontFamily: "'King and Queen', serif",
-              fontWeight: 400,
-              fontSize: "clamp(26px, 3.4vw, 40px)",
-              lineHeight: 1.35,
-              color: NAVY,
-            }}
-          >
-            Fais de toi la Capitaine de ta vie, une femme en puissance qui
-            s&apos;écoute, qui s&apos;honore, qui se remet au centre.
-          </p>
 
           <div className="about-cell about-paragraphs">
             <p className="reveal-item" style={body}>
@@ -263,16 +261,16 @@ export default function Sections() {
                 ].map((item) => (
                   <li
                     key={item}
-                     style={{
-                       fontFamily: "'DM Sans', sans-serif",
-                       fontWeight: 300,
-                       fontSize: "13px",
-                       color: NAVY,
-                       padding: "10px 22px",
-                       border: `1px solid ${NAVY}`,
-                       borderRadius: "999px",
-                       display: "inline-block",
-                     }}
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 300,
+                      fontSize: "13px",
+                      color: NAVY,
+                      padding: "10px 22px",
+                      border: `1px solid ${NAVY}`,
+                      borderRadius: "999px",
+                      display: "inline-block",
+                    }}
                   >
                     {item}
                   </li>

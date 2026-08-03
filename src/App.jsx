@@ -118,7 +118,7 @@ export default function App() {
             gap: "clamp(14px, 2.5vw, 30px)",
           }}
         >
-          <Title style={{ width: "min(72vw, 880px)", height: "auto" }} />
+          <Title style={{ width: "min(86vw, 880px)", height: "auto" }} />
           <Subtitle
             style={{
               fontFamily: "'DM Sans', sans-serif",
