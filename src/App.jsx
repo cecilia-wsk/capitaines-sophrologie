@@ -104,8 +104,8 @@ export default function App() {
         />
       </div>
 
-      {/* Pill navbar — appears once the hero is scrolled past */}
-      <Navbar visible={scroll >= 1} />
+      {/* Pill navbar — appears shortly after the user starts scrolling */}
+      <Navbar visible={scroll >= 0.3} />
 
       {/* Hero */}
       <header
