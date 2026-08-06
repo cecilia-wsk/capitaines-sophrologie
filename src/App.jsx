@@ -14,11 +14,11 @@ import { scrollToSection } from "./lenis";
   stays fully visible across the whole viewport.
  */
 const STOPS = [
-  [0.973, 0.91, 0.792], // cream        (hero settled)
-  [0.98, 0.863, 0.71], // warm cream   (bridge 1)
-  [0.98, 0.843, 0.71], // light orange (section 2)
-  [0.98, 0.843, 0.745], // orange-rose  (bridge 2)
-  [0.953, 0.808, 0.878], // soft rose    (section 3)
+  [0.973, 0.91, 0.792], // cream        (hero settled) rgb(248, 232, 202) — #F8E8CA
+  [0.98, 0.863, 0.71], // warm cream   (bridge 1).     rgb(250, 220, 181) — #FADCB5
+  [0.99, 0.816, 0.643], // light orange (section 2).    rgb(252, 208, 164) — #FAD7B5
+  [0.953, 0.808, 0.878], // orange rose    (section 3).  rgb(243, 206, 224) — #F3CEE0
+  [0.996, 0.78, 0.918], // soft-rose  (bridge 2).    rgb(254, 199, 234) — #FAD7BE
 ];
 
 function mixArr(a, b, t) {

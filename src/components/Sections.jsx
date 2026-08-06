@@ -204,7 +204,7 @@ function useCardsReveal(sectionRef, selector) {
         opacity: 0,
         duration: 1.2,
         ease: "power3.out",
-        stagger: 0.12,
+        stagger: 0.18,
         scrollTrigger: {
           trigger: cards[0],
           start: "top 85%",
@@ -584,8 +584,8 @@ export default function Sections() {
           ))}
         </div>
 
-        <div className="first-session">
-          <H2Reveal>
+        <div className="first-session session-card">
+          <h3>
             <svg
               className="session-info-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -599,22 +599,20 @@ export default function Sections() {
               />
             </svg>
             Comment se passe la première séance?
-          </H2Reveal>
-          <ParagraphReveal>
-            <p className="line-block">
-              Il n’y a rien à préparer, rien à réussir et rien à prouver. Cette
-              première rencontre permet surtout de comprendre ce que tu vis et
-              ce que tu souhaites faire évoluer.
-            </p>
-            <ol className="steps">
-              <li>
-                Nous faisons connaissance et tu déposes ce que tu souhaites.
-              </li>
-              <li>Nous clarifions ensemble ton besoin et ton objectif.</li>
-              <li>Je te guide dans une première pratique douce.</li>
-              <li>Nous échangeons sur ton vécu et sur la suite possible.</li>
-            </ol>
-          </ParagraphReveal>
+          </h3>
+          <p className="line-block">
+            Il n’y a rien à préparer, rien à réussir et rien à prouver. Cette
+            première rencontre permet surtout de comprendre ce que tu vis et ce
+            que tu souhaites faire évoluer.
+          </p>
+          <ol className="steps">
+            <li>
+              Nous faisons connaissance et tu déposes ce que tu souhaites.
+            </li>
+            <li>Nous clarifions ensemble ton besoin et ton objectif.</li>
+            <li>Je te guide dans une première pratique douce.</li>
+            <li>Nous échangeons sur ton vécu et sur la suite possible.</li>
+          </ol>
         </div>
 
         <div className="cabinet-grid">
