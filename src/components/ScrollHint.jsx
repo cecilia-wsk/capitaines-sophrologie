@@ -13,7 +13,7 @@ export default function ScrollHint({ style, className, onClick }) {
         opacity: 0,
         duration: 1.2,
         ease: "power2.out",
-        delay: 2.2, // after the subtitle fade
+        delay: 1.6, // after the subtitle fade
       });
       gsap.to(root.current, {
         y: 10,
@@ -21,7 +21,7 @@ export default function ScrollHint({ style, className, onClick }) {
         ease: "sine.inOut",
         repeat: -1,
         yoyo: true,
-        delay: 2.4,
+        delay: 0.4,
       });
     }, root);
     return () => ctx.revert();
@@ -36,7 +36,10 @@ export default function ScrollHint({ style, className, onClick }) {
 
     const tick = () => {
       raf = 0;
-      const t = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.25)));
+      const t = Math.min(
+        1,
+        Math.max(0, window.scrollY / (window.innerHeight * 0.25)),
+      );
       gsap.set(el, { opacity: 1 - t });
     };
 

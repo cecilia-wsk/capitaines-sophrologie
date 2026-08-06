@@ -3,7 +3,9 @@ import Grainient from "./components/Grainient/Grainient";
 import Title from "./components/Title";
 import Subtitle from "./components/Subtitle";
 import ScrollHint from "./components/ScrollHint";
+import Navbar from "./components/Navbar";
 import Sections from "./components/Sections";
+import { scrollToSection } from "./lenis";
 
 /*
   Background colour stops for the Grainient shader's settling target.
@@ -39,6 +41,9 @@ export default function App() {
   const [scroll, setScroll] = useState(0);
   // 0 at top of content -> 1 once the last section is reached
   const [targetColor, setTargetColor] = useState(STOPS[0]);
+
+  // hero title + subtitle visible only (near) the top of the page
+  const heroContentVisible = scroll < 0.03;
 
   const mainRef = useRef(null);
 
@@ -99,6 +104,9 @@ export default function App() {
         />
       </div>
 
+      {/* Pill navbar — appears once the hero is scrolled past */}
+      <Navbar visible={scroll >= 1} />
+
       {/* Hero */}
       <header
         style={{
@@ -118,8 +126,12 @@ export default function App() {
             gap: "clamp(14px, 2.5vw, 30px)",
           }}
         >
-          <Title style={{ width: "min(86vw, 880px)", height: "auto" }} />
+          <Title
+            visible={heroContentVisible}
+            style={{ width: "min(86vw, 880px)", height: "auto" }}
+          />
           <Subtitle
+            visible={heroContentVisible}
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontWeight: 300,
@@ -134,11 +146,7 @@ export default function App() {
         </div>
         <ScrollHint
           style={{ pointerEvents: "auto", cursor: "pointer" }}
-          onClick={() =>
-            document
-              .getElementById("content")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
+          onClick={() => scrollToSection("#content")}
         />
       </header>
 
